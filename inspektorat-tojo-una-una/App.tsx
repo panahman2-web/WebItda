@@ -31,12 +31,23 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-cyber-900 text-slate-200 font-sans selection:bg-cyber-cyan selection:text-cyber-900 relative overflow-x-hidden">
-      {/* Background Effects */}
+    <div className="min-h-screen bg-cyber-950 text-slate-200 font-sans selection:bg-cyber-cyan selection:text-cyber-900 relative overflow-x-hidden">
+      {/* Background Effects - Formal & Futuristic */}
       <div className="fixed inset-0 z-0 pointer-events-none">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
-        <div className="absolute left-0 right-0 top-0 -z-10 m-auto h-[310px] w-[310px] rounded-full bg-cyber-cyan opacity-20 blur-[100px]"></div>
-        <div className="absolute right-0 bottom-0 -z-10 h-[300px] w-[300px] rounded-full bg-cyber-purple opacity-20 blur-[100px]"></div>
+        {/* Deep Navy Base */}
+        <div className="absolute inset-0 bg-cyber-950"></div>
+        
+        {/* Subtle Grid - Symbolizing Data & Structure */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:40px_40px] opacity-[0.15]"></div>
+        
+        {/* Top Center Glow (Authority/Light) - Cyan/Blue */}
+        <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 h-[500px] w-[800px] rounded-full bg-cyber-blue opacity-10 blur-[120px]"></div>
+        
+        {/* Bottom Right Glow (Prestige) - Gold/Amber hint */}
+        <div className="absolute bottom-[-10%] right-[-10%] h-[500px] w-[500px] rounded-full bg-cyber-gold opacity-5 blur-[100px]"></div>
+        
+        {/* Vignette for focus */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,#020617_100%)]"></div>
       </div>
 
       <div className="relative z-10 flex flex-col min-h-screen">

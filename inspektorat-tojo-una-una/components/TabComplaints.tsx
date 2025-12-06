@@ -1,5 +1,6 @@
+
 import React, { useState, useRef } from 'react';
-import { Send, AlertTriangle, Paperclip, Lock, ShieldAlert, Upload, X, CheckCircle2, FileWarning } from 'lucide-react';
+import { Send, Paperclip, Lock, ShieldAlert, Upload, X, CheckCircle2, FileWarning } from 'lucide-react';
 
 interface FormData {
   name: string;
@@ -58,18 +59,56 @@ const TabComplaints: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Construct mailto link
-    const subject = `[WBS] Pengaduan: ${formData.category}`;
-    let body = `NAMA PELAPOR: ${formData.name}\nNO. KONTAK: ${formData.contact}\n\nURAIAN PENGADUAN:\n${formData.description}\n\n`;
+    // Construct a formal report structure for the email body
+    const currentDate = new Date().toLocaleDateString('id-ID', {
+      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+    });
+
+    const subject = `LAPORAN PENGADUAN WBS - ${formData.category.toUpperCase()}`;
     
-    if (file) {
-      body += `[SISTEM NOTE]: Saya ingin melampirkan file bukti: "${file.name}". Mohon cek lampiran pada email ini.`;
-      alert(`PENTING: Karena keterbatasan keamanan browser, file "${file.name}" tidak dapat dilampirkan secara otomatis ke aplikasi email Anda.\n\nMohon lampirkan file tersebut secara manual pada jendela email yang akan terbuka.`);
-    } else {
-      body += `(Tidak ada bukti lampiran yang disertakan pada formulir ini)`;
-    }
-    
+    // Format resembling a formal document/form
+    const body = 
+`KEPADA YTH.
+ADMIN INSPEKTORAT DAERAH KABUPATEN TOJO UNA-UNA
+DI TEMPAT
+
+PERIHAL: LAPORAN PENGADUAN MASYARAKAT (WHISTLEBLOWING SYSTEM)
+
+Dengan hormat,
+Berikut saya sampaikan laporan pengaduan dengan rincian sebagai berikut:
+
+A. IDENTITAS PELAPOR
+   Nama           : ${formData.name || 'Dirahasiakan (Anonim)'}
+   Kontak/Email   : ${formData.contact}
+   Tanggal Lapor  : ${currentDate}
+
+B. DATA PENGADUAN
+   Kategori       : ${formData.category}
+   
+C. URAIAN LAPORAN
+------------------------------------------------------------
+${formData.description}
+------------------------------------------------------------
+
+D. LAMPIRAN BUKTI
+   Status Bukti   : ${file ? `Saya memiliki file bukti bernama "${file.name}"` : 'Tidak ada lampiran'}
+   
+   (CATATAN SISTEM: Mohon lampirkan file bukti secara manual pada email ini sebelum menekan tombol Kirim).
+
+Demikian laporan ini saya buat dengan sebenar-benarnya untuk dapat ditindaklanjuti.
+
+Hormat Saya,
+
+${formData.name || 'Pelapor'}
+`;
+
+    // Encode standard URI components but preserve line breaks for email clients
     const mailtoLink = `mailto:itdatouna1@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    
+    // Alert user about attachment limitation
+    if (file) {
+      alert(`MOHON PERHATIAN:\n\nSistem telah menyiapkan format laporan di aplikasi Email Anda.\n\nFile "${file.name}" TIDAK DAPAT dilampirkan secara otomatis karena kebijakan keamanan browser.\n\nMohon KLIK tombol 'Attach/Lampirkan' pada email yang terbuka dan pilih file tersebut secara manual.`);
+    }
     
     // Open default mail client
     window.location.href = mailtoLink;
@@ -260,7 +299,7 @@ const TabComplaints: React.FC = () => {
                     </button>
                     
                     <p className="text-xs text-center text-gray-500 mt-4">
-                        Sistem akan mengarahkan ke email client Anda. Pastikan data sudah benar sebelum mengirim.
+                        Data laporan Anda akan disusun otomatis menjadi format surat resmi di aplikasi Email Anda.
                     </p>
                 </form>
             </div>

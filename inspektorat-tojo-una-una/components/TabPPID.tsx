@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { FileText, Download, Image, Calendar, Info, Search, UploadCloud, ChevronRight, Trash2, Plus, X } from 'lucide-react';
+
+import React, { useState, useRef } from 'react';
+import { FileText, Download, Image, Calendar, Info, Search, UploadCloud, ChevronRight, Trash2, Plus, X, File, Check } from 'lucide-react';
 
 interface TabPPIDProps {
   isAdmin: boolean;
@@ -40,6 +41,8 @@ const TabPPID: React.FC<TabPPIDProps> = ({ isAdmin }) => {
   const [docs, setDocs] = useState(initialDocs);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [newDocTitle, setNewDocTitle] = useState('');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Filter documents based on search
   const filteredDocs = docs.filter(doc => 
@@ -48,25 +51,39 @@ const TabPPID: React.FC<TabPPIDProps> = ({ isAdmin }) => {
 
   const handleUploadClick = () => {
     setShowUploadModal(true);
+    setNewDocTitle('');
+    setSelectedFile(null);
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setSelectedFile(e.target.files[0]);
+    }
   };
 
   const handleUploadSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (newDocTitle) {
+    if (newDocTitle && selectedFile) {
+      const fileSizeMB = (selectedFile.size / (1024 * 1024)).toFixed(1);
+      
       const newDoc = {
         id: Date.now(),
         title: newDocTitle,
-        size: '1.5 MB', // Mock size
+        size: `${fileSizeMB} MB`,
         date: new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
       };
       setDocs([newDoc, ...docs]);
       setNewDocTitle('');
+      setSelectedFile(null);
       setShowUploadModal(false);
+      alert('Dokumen berhasil diupload!');
+    } else {
+      alert('Mohon lengkapi judul dan pilih file.');
     }
   };
 
   const handleDelete = (id: number) => {
-    if (window.confirm('Apakah Anda yakin ingin menghapus dokumen ini?')) {
+    if (window.confirm('PERINGATAN ADMIN: Apakah Anda yakin ingin menghapus dokumen publik ini?')) {
       setDocs(docs.filter(doc => doc.id !== id));
     }
   };
@@ -303,17 +320,42 @@ const TabPPID: React.FC<TabPPIDProps> = ({ isAdmin }) => {
                </div>
                
                <div>
-                 <label className="block text-sm text-gray-300 mb-2">File Dokumen (PDF/DOCX)</label>
-                 <div className="border-2 border-dashed border-gray-600 hover:border-cyber-cyan rounded-lg p-8 text-center cursor-pointer transition-colors bg-cyber-800/50">
-                    <UploadCloud className="mx-auto h-10 w-10 text-gray-400 mb-2" />
-                    <p className="text-sm text-gray-400">Klik untuk memilih file</p>
+                 <label className="block text-sm text-gray-300 mb-2">File Dokumen (PDF Diutamakan)</label>
+                 <div 
+                    className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${selectedFile ? 'border-cyber-cyan bg-cyber-cyan/10' : 'border-gray-600 hover:border-cyber-cyan bg-cyber-800/50'}`}
+                    onClick={() => fileInputRef.current?.click()}
+                 >
+                    <input 
+                        type="file" 
+                        ref={fileInputRef}
+                        onChange={handleFileSelect}
+                        accept=".pdf,.doc,.docx,.xls,.xlsx"
+                        className="hidden"
+                    />
+                    
+                    {selectedFile ? (
+                       <div className="flex flex-col items-center animate-in fade-in">
+                          <div className="p-3 bg-cyber-900 rounded-full border border-cyber-cyan mb-2">
+                             <Check className="w-6 h-6 text-cyber-cyan" />
+                          </div>
+                          <p className="text-white font-medium">{selectedFile.name}</p>
+                          <p className="text-xs text-gray-400 mt-1">{(selectedFile.size / 1024 / 1024).toFixed(2)} MB</p>
+                          <span className="text-xs text-cyber-cyan mt-2 underline">Klik untuk ganti file</span>
+                       </div>
+                    ) : (
+                       <>
+                          <UploadCloud className="mx-auto h-10 w-10 text-gray-400 mb-2" />
+                          <p className="text-sm text-gray-400">Klik untuk memilih file PDF/Office</p>
+                       </>
+                    )}
                  </div>
                </div>
                
                <div className="pt-4">
                  <button 
                     type="submit"
-                    className="w-full bg-cyber-cyan text-cyber-900 font-bold py-3 rounded-lg hover:bg-white transition-colors"
+                    className="w-full bg-cyber-cyan text-cyber-900 font-bold py-3 rounded-lg hover:bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={!newDocTitle || !selectedFile}
                  >
                    UPLOAD SEKARANG
                  </button>
